@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<title>jQuery.Thumb</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/monokai-sublime.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700">
+	<style>
+		body {
+			background: #333333;
+			color: #FFFFFF;
+			display: flex;
+			min-height: 100vh;
+			flex-direction: column;
+			font-family: 'Roboto', sans-serif;
+		}
+		header {
+			background: #282828;
+			color: #FFFFFF;
+		}
+		header .logo {
+			font-size: 2rem;
+			font-weight: 300;
+			margin: 0;
+		}
+		footer {
+			background: #282828;
+			color: #FFFFFF;
+		}
+		section {
+			flex: 1 0 0;
+		}
+		h1, h2, h3, h4, h5, h6 {
+			font-weight: 300;
+		}
+		.tagline {
+			font-size: 1.25rem;
+			font-weight: 300;
+			font-style: italic;
+			margin-bottom: 5px;
+		}
+		.js-thumb, .js-preview {
+			margin-bottom: 15px;
+		}
+		.demo-wrapper {
+			background: #23241F;
+			border-radius: 3px;
+			padding: 10px;
+			margin-bottom: 15px;
+		}
+		.demo-wrapper > *:last-child {
+			margin-bottom: 0;
+		}
+		a {
+			color: #26C6DA;
+		}
+		a:hover {
+			color: #00ACC1;
+			text-decoration: none;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<div class="container p-3">
+			<h1 class="logo">jQuery.Thumb</h1>
+		</div>
+	</header>
+	<section>
+		<div class="container p-3">
+			<p class="tagline">Process thumbnails in-browser</p>
+			<p>This plugin generates thumbnails automatically for <code>input</code> items, cropping the images on-the-fly to show a preview right into the client. No upload required.</p>
+			<h2 id="live-demo">Live demo</h2>
+			<div class="demo-wrapper">
+				<input type="file" name="file" id="file" class="js-thumb">
+				<div class="js-preview">
+					<img src="https://via.placeholder.com/150" alt="">
+				</div>
+			</div>
+			<!--  -->
+			<h2 id="installing">Installing</h2>
+			<p>Just download <code>jquery.thumb.js</code> then add it to your HTML file:</p>
+			<pre class="html"><code>&lt;script type=&quot;text/javascript&quot; src=&quot;js/jquery.thumb.js&quot;&gt;&lt;/script&gt;</code></pre>
+			<p>You may instead use the minified version if you like.</p>
+			<h2 id="basic-usage">Basic usage</h2>
+			<p>You&#39;ll need an <code>input</code> with a <code>type=&quot;file&quot;</code> attribute:</p>
+			<pre class="html"><code>&lt;input type=&quot;file&quot; name=&quot;file&quot; id=&quot;file&quot; class=&quot;js-thumb&quot;&gt;</code></pre>
+			<p>Also you&#39;ll need a preview area, it may have a placeholder image if you want:</p>
+			<pre class="html"><code>&lt;div class=&quot;js-preview&quot;&gt;
+    &lt;img src=&quot;https://via.placeholder.com/150&quot; alt=&quot;&quot;&gt;
+&lt;/div&gt;</code></pre>
+			<p>Then just call the plugin this way:</p>
+			<pre class="javascript"><code>$(&#39;.js-thumb&#39;).thumb({
+    width: 150,
+    height: 150,
+    center: true,
+    preview: &#39;.js-preview&#39;
+});</code></pre>
+			<p>You may pass the following options:</p>
+			<ul>
+				<li><code>width</code> - The width of the generated thumbnail</li>
+				<li><code>height</code> - The height of the generated thumbnail</li>
+				<li><code>center</code> - Whether to center the image before cropping the thumbnail or not</li>
+				<li><code>preview</code> - Selector of the preview area (an <code>img</code> will be created inside)</li>
+				<li><code>fitMode</code> - The fit mode, <code>$.thumb.FitModes.FitLong</code> fits the long side and <code>$.thumb.FitModes.FitShort</code> fits the short one</li>
+				<li><code>keepRatio</code> - Whether to keep the aspect ratio or not</li>
+				<li><code>pixelPerfect</code> - Whether to turn off image smoothing or not</li>
+				<li><code>callbacks</code> - A <code>callbacks</code> object, check <strong>Advanced usage</strong></li>
+			</ul>
+			<h2 id="advanced-usage">Advanced usage</h2>
+			<p>You may modify the default behavior by overriding the <code>callbacks</code> option. The supported callbacks are explained below.</p>
+			<h3 id="onload">onLoad</h3>
+			<p>Receives two parameters: the original image as <code>image</code> and the options hash as <code>options</code>.</p>
+			<p>By default, this callback checks for EXIF data to read the orientation flag (checking if the <a href="https://github.com/exif-js/exif-js">exif.js</a> library is available) and calls <code>$.thumb.api.resize(image, options);</code>. If there is no EXIF data or support, the orientation is set to -1.</p>
+			<pre class="javascript"><code>onLoad: function(image, options) {
+    if (typeof EXIF !== &#39;undefined&#39;) {
+        EXIF.getData(image, function() {
+            options.orientation = EXIF.getTag(this, &#39;Orientation&#39;);
+            $.thumb.api.resize(image, options);
+        });
+    } else {
+        options.orientation = -1;
+        $.thumb.api.resize(image, options);
+    }
+}</code></pre>
+			<h3 id="onresize">onResize</h3>
+			<p>This is called after the image has been processed; receives three parameters: the preview element as <code>preview</code>, the thumbnail image as <code>image</code> and the options hash as <code>options</code>.</p>
+			<p>By default appends or replaces an <code>img</code> element inside the preview element.</p>
+			<pre class="javascript"><code>onResize: function(preview, image, options) {
+    var target = preview.find(&#39;img&#39;);
+    if (target.length) {
+        target.replaceWith(image);
+    } else {
+        preview.append(image);
+    }
+}</code></pre>
+			<h2 id="requirements">Requirements</h2>
+			<ul>
+				<li>jQuery 1.8+</li>
+				<li>A recent/decent web browser (Firefox, Chrome or Opera suggested; <strong>IE/Edge NOT TESTED/DON&#39;T CARE</strong>)</li>
+			</ul>
+			<h2 id="licensing">Licensing</h2>
+			<p>MIT Licensed</p>
+			<h2 id="contributing">Contributing</h2>
+			<p>Fork the repo, add an interesting feature or fix a bug and send a pull request.</p>
+			<h2 id="troubleshooting">Troubleshooting</h2>
+			<p>Open an issue and provide a clear description of the error, how to reproduce it and your test environment specs (browser, jQuery version, etc.)</p>
+			<h2 id="credits">Credits</h2>
+			<p>Lead coder: biohzrdmx (<a href="https://github.com/biohzrdmx">github.com/biohzrdmx</a>)</p>
+			<!--  -->
+		</div>
+	</section>
+	<footer>
+		<div class="container p-3 text-center">
+			<small>&copy; 2018 biohzrdmx. All rights reserved.</small>
+		</div>
+	</footer>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+	<script type="text/javascript" src="jquery.thumb.min.js"></script>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			$('.js-thumb').thumb({
+				width: 150,
+				height: 150,
+				center: true,
+				preview: '.js-preview'
+			});
+			hljs.initHighlightingOnLoad();
+		});
+	</script>
+</body>
+</html>
