@@ -4,6 +4,8 @@ Process thumbnails in-browser.
 
 This plugin generates thumbnails automatically for `input` items, cropping the images on-the-fly to show a preview right into the client. No upload required.
 
+[Live demo and documentation](https://biohzrdmx.github.io/jQuery.Thumb/)
+
 ## Installing
 
 Just download `jquery.thumb.js` then add it to your HTML file:
@@ -47,7 +49,7 @@ You may pass the following options:
 - `height` - The height of the generated thumbnail
 - `center` - Whether to center the image before cropping the thumbnail or not
 - `preview` - Selector of the preview area (an `img` will be created inside)
-- `fitMode` - The fit mode, `$.thumb.FitModes.FitLong` fits the long side and $.thumb.FitModes.FitShort fits the short one
+- `fitMode` - The fit mode, `$.thumb.FitModes.FitLong` fits the long side and `$.thumb.FitModes.FitShort` fits the short one
 - `keepRatio` - Whether to keep the aspect ratio or not
 - `pixelPerfect` - Whether to turn off image smoothing or not
 - `callbacks` - A `callbacks` object, check **Advanced usage**
